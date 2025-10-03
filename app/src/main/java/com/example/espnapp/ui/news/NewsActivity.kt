@@ -46,6 +46,7 @@ class NewsActivity : AppCompatActivity() {
                 is UiState.Error -> render(error = state.message)
             }
         }
+        render(loading = true)
         vm.loadNews()
     }
 
