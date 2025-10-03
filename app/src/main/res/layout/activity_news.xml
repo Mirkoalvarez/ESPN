@@ -14,6 +14,13 @@
             android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
     </LinearLayout>
 
+    <Spinner
+        android:id="@+id/spnLeague"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:prompt="@string/league_selector_prompt" />
+
     <TextView
         android:id="@+id/txtLeagueTitle"
         android:layout_width="match_parent"

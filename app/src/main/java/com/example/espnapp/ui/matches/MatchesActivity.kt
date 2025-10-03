@@ -1,7 +1,6 @@
 package com.example.espnapp.ui.matches
 
 import android.app.DatePickerDialog
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
@@ -9,7 +8,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.espnapp.common.UiState
 import com.example.espnapp.databinding.ActivityMatchesBinding
-import com.example.espnapp.ui.news.NewsActivity
 import com.example.espnapp.util.dateToYyyyMmDd
 import com.example.espnapp.util.todayYyyyMmDd
 import java.util.Calendar
@@ -27,7 +25,6 @@ class MatchesActivity : AppCompatActivity() {
     )
 
     private var selectedLeague = leagues.first().second
-    private var selectedLeagueName = leagues.first().first
     private var selectedDate = todayYyyyMmDd()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,15 +42,7 @@ class MatchesActivity : AppCompatActivity() {
 
         b.spnLeague.setOnItemSelectedListenerCompat { position ->
             selectedLeague = leagues[position].second
-            selectedLeagueName = leagues[position].first
             vm.load(selectedLeague, selectedDate)
-        }
-
-        b.btnLeagueNews.setOnClickListener {
-            startActivity(Intent(this, NewsActivity::class.java).apply {
-                putExtra(NewsActivity.EXTRA_LEAGUE_ID, selectedLeague)
-                putExtra(NewsActivity.EXTRA_LEAGUE_NAME, selectedLeagueName)
-            })
         }
 
         b.btnPickDate.setOnClickListener {

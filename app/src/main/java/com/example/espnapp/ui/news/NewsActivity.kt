@@ -4,14 +4,16 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.ArrayAdapter
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.espnapp.R
 import com.example.espnapp.common.UiState
 import com.example.espnapp.databinding.ActivityNewsBinding
 import com.example.espnapp.ui.matches.MatchesActivity
+import com.example.espnapp.ui.matches.setOnItemSelectedListenerCompat
 import com.example.espnapp.ui.teams.TeamsActivity
-import androidx.recyclerview.widget.LinearLayoutManager
 
 class NewsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNewsBinding
@@ -20,11 +22,18 @@ class NewsActivity : AppCompatActivity() {
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
     }
 
-    private val leagueId: String by lazy {
+    private val leagues = listOf(
+        "Premier League" to "eng.1",
+        "MLS" to "usa.1",
+        "Europa League" to "uefa.europa",
+        "Liga argentina" to "arg.1",
+        "Liga española" to "esp.1"
+    )
+    private var selectedLeagueId = DEFAULT_LEAGUE_ID
+    private var selectedIndex = 0
+
+    private val initialLeagueId: String by lazy {
         intent.getStringExtra(EXTRA_LEAGUE_ID) ?: DEFAULT_LEAGUE_ID
-    }
-    private val leagueName: String by lazy {
-        intent.getStringExtra(EXTRA_LEAGUE_NAME) ?: DEFAULT_LEAGUE_NAME
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,13 +44,32 @@ class NewsActivity : AppCompatActivity() {
         binding.recycler.layoutManager = LinearLayoutManager(this)
         binding.recycler.adapter = adapter
 
+        binding.spnLeague.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            leagues.map { it.first }
+        )
+
+        val initialIndex = leagues.indexOfFirst { it.second == initialLeagueId }.takeIf { it >= 0 } ?: 0
+        updateLeagueSelection(initialIndex, triggerLoad = false)
+        binding.spnLeague.setSelection(initialIndex)
+
+        binding.spnLeague.setOnItemSelectedListenerCompat { position ->
+            if (position != selectedIndex) {
+                updateLeagueSelection(position)
+            }
+        }
+
         binding.btnGoMatches.setOnClickListener {
             startActivity(Intent(this, MatchesActivity::class.java))
         }
         binding.btnGoTeams.setOnClickListener {
             startActivity(Intent(this, TeamsActivity::class.java))
         }
-        binding.viewError.btnRetry.setOnClickListener { vm.loadNews() }
+        binding.viewError.btnRetry.setOnClickListener {
+            render(loading = true)
+            vm.loadNews(selectedLeagueId)
+        }
 
         vm.state.observe(this) { state ->
             when (state) {
@@ -55,7 +83,7 @@ class NewsActivity : AppCompatActivity() {
             }
         }
         render(loading = true)
-        vm.loadNews(leagueId)
+        vm.loadNews(selectedLeagueId)
     }
 
     private fun render(
@@ -71,10 +99,18 @@ class NewsActivity : AppCompatActivity() {
         binding.viewError.txtError.text = error ?: ""
     }
 
+    private fun updateLeagueSelection(position: Int, triggerLoad: Boolean = true) {
+        selectedIndex = position
+        selectedLeagueId = leagues[position].second
+        binding.txtLeagueTitle.text = getString(R.string.news_league_title, leagues[position].first)
+        if (triggerLoad) {
+            render(loading = true)
+            vm.loadNews(selectedLeagueId)
+        }
+    }
+
     companion object {
         const val EXTRA_LEAGUE_ID = "extra_league_id"
-        const val EXTRA_LEAGUE_NAME = "extra_league_name"
         private const val DEFAULT_LEAGUE_ID = "eng.1"
-        private const val DEFAULT_LEAGUE_NAME = "Premier League"
     }
 }
