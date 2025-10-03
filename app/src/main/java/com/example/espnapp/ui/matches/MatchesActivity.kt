@@ -1,6 +1,7 @@
 package com.example.espnapp.ui.matches
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
@@ -8,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.espnapp.common.UiState
 import com.example.espnapp.databinding.ActivityMatchesBinding
+import com.example.espnapp.ui.news.NewsActivity
 import com.example.espnapp.util.dateToYyyyMmDd
 import com.example.espnapp.util.todayYyyyMmDd
 import java.util.Calendar
@@ -18,7 +20,14 @@ class MatchesActivity : AppCompatActivity() {
     private val vm: MatchesViewModel by viewModels()
     private val adapter = MatchAdapter()
 
-    private var selectedLeague = "eng.1"
+    private val leagues = listOf(
+        "Premier League" to "eng.1",
+        "MLS" to "usa.1",
+        "Europa League" to "uefa.europa"
+    )
+
+    private var selectedLeague = leagues.first().second
+    private var selectedLeagueName = leagues.first().first
     private var selectedDate = todayYyyyMmDd()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,18 +39,21 @@ class MatchesActivity : AppCompatActivity() {
         b.recycler.layoutManager = LinearLayoutManager(this)
         b.recycler.adapter = adapter
 
-        val leagues = listOf(
-            "Premier League" to "eng.1",
-            "MLS" to "usa.1",
-            "Europa League" to "uefa.europa"
-        )
         b.spnLeague.adapter = ArrayAdapter(
             this, android.R.layout.simple_spinner_dropdown_item, leagues.map { it.first }
         )
 
         b.spnLeague.setOnItemSelectedListenerCompat { position ->
             selectedLeague = leagues[position].second
+            selectedLeagueName = leagues[position].first
             vm.load(selectedLeague, selectedDate)
+        }
+
+        b.btnLeagueNews.setOnClickListener {
+            startActivity(Intent(this, NewsActivity::class.java).apply {
+                putExtra(NewsActivity.EXTRA_LEAGUE_ID, selectedLeague)
+                putExtra(NewsActivity.EXTRA_LEAGUE_NAME, selectedLeagueName)
+            })
         }
 
         b.btnPickDate.setOnClickListener {

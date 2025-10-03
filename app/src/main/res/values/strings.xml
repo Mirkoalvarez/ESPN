@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">ESPNApp</string>
+    <string name="matches_button_news">Noticias</string>
+    <string name="news_default_title">Noticias</string>
+    <string name="news_league_title">Noticias - %1$s</string>
+
+    <string name="league_selector_prompt">Selecciona una liga</string>
+    <string name="league_spanish">Liga española</string>
+    <string name="league_premier">Premier League</string>
+    <string name="league_argentine">Liga argentina</string>
+    <string name="league_mls">MLS</string>
 </resources>

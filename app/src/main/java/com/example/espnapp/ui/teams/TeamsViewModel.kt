@@ -13,11 +13,11 @@ class TeamsViewModel : ViewModel() {
     private val _state = MutableLiveData<UiState<List<Team>>>()
     val state: LiveData<UiState<List<Team>>> = _state
 
-    fun load() {
+    fun load(leagueId: String) {
         _state.value = UiState.Loading
         viewModelScope.launch {
             try {
-                val resp = EspnApis.site.getPremierLeagueTeams()
+                val resp = EspnApis.site.getTeams(leagueId)
                 val teams = resp.sports.orEmpty()
                     .flatMap { it.leagues.orEmpty() }
                     .flatMap { it.teams.orEmpty() }

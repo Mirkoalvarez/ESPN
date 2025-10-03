@@ -13,16 +13,24 @@ class NewsViewModel : ViewModel() {
     private val _state = MutableLiveData<UiState<List<Article>>>()
     val state: LiveData<UiState<List<Article>>> = _state
 
-    fun loadNews() {
+    private var currentLeague = DEFAULT_LEAGUE
+
+    fun loadNews(league: String? = null) {
+        val targetLeague = league ?: currentLeague
+        currentLeague = targetLeague
         _state.value = UiState.Loading
         viewModelScope.launch {
             try {
-                val res = EspnApis.site.getPremierLeagueNews()
+                val res = EspnApis.site.getLeagueNews(targetLeague)
                 val list = res.articles.orEmpty()
                 _state.value = if (list.isEmpty()) UiState.Empty else UiState.Success(list)
             } catch (e: Exception) {
-                _state.value = UiState.Error("Failed to load Premier League news.", e)
+                _state.value = UiState.Error("Failed to load news.", e)
             }
         }
+    }
+
+    companion object {
+        private const val DEFAULT_LEAGUE = "eng.1"
     }
 }

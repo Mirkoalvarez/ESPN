@@ -14,6 +14,15 @@
             android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"/>
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/txtLeagueTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/news_default_title"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
+        android:textStyle="bold" />
+
     <ProgressBar android:id="@+id/progress"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_gravity="center" android:visibility="gone"/>

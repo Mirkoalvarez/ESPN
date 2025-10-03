@@ -22,10 +22,14 @@ class TeamDetailActivity : AppCompatActivity() {
         const val EXTRA_TEAM_ID = "team_id"
         const val EXTRA_TEAM_NAME = "team_name"
         const val EXTRA_TEAM_LOGO = "team_logo"
+        const val EXTRA_LEAGUE_ID = "league_id"
+        private const val DEFAULT_LEAGUE_ID = "eng.1"
     }
 
     private lateinit var b: ActivityTeamDetailBinding
     private val adapter = RosterAdapter { openPlayer(it) }
+    private var teamId: String? = null
+    private var leagueId: String = DEFAULT_LEAGUE_ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +37,8 @@ class TeamDetailActivity : AppCompatActivity() {
         setContentView(b.root)
 
         val teamId = intent.getStringExtra(EXTRA_TEAM_ID) ?: return finish()
+        this.teamId = teamId
+        leagueId = intent.getStringExtra(EXTRA_LEAGUE_ID) ?: DEFAULT_LEAGUE_ID
         b.recycler.layoutManager = LinearLayoutManager(this)
         b.recycler.adapter = adapter
 
@@ -40,15 +46,16 @@ class TeamDetailActivity : AppCompatActivity() {
         val logo = intent.getStringExtra(EXTRA_TEAM_LOGO)
         if (!logo.isNullOrBlank()) Picasso.get().load(logo).into(b.imgLogo)
 
-        b.viewError.btnRetry.setOnClickListener { load(teamId) }
-        load(teamId)
+        b.viewError.btnRetry.setOnClickListener { loadTeam() }
+        loadTeam()
     }
 
-    private fun load(teamId: String) {
+    private fun loadTeam() {
+        val teamId = this.teamId ?: return
         render(loading = true)
         lifecycleScope.launch {
             try {
-                val res = EspnApis.site.getTeamWithRoster(teamId)
+                val res = EspnApis.site.getTeamWithRoster(leagueId, teamId)
                 val list = parseAthletes(res.team?.athletes)
                 if (list.isEmpty()) render(empty = true) else {
                     adapter.submit(list)

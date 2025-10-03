@@ -10,9 +10,9 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface EspnSiteApi {
-    // EPL news
-    @GET("apis/site/v2/sports/soccer/eng.1/news")
-    suspend fun getPremierLeagueNews(): NewsResponse
+    // News by league
+    @GET("apis/site/v2/sports/soccer/{league}/news")
+    suspend fun getLeagueNews(@Path("league") league: String): NewsResponse
 
     // Scoreboard by league and date (YYYYMMDD)
     @GET("apis/site/v2/sports/soccer/{league}/scoreboard")
@@ -21,13 +21,16 @@ interface EspnSiteApi {
         @Query("dates") yyyymmdd: String
     ): ScoreboardResponse
 
-    // EPL Teams
-    @GET("apis/site/v2/sports/soccer/eng.1/teams")
-    suspend fun getPremierLeagueTeams(): TeamsResponse
+    // Teams by league
+    @GET("apis/site/v2/sports/soccer/{league}/teams")
+    suspend fun getTeams(
+        @Path("league") league: String
+    ): TeamsResponse
 
     // Team detail with roster enabled (?enable=roster)
-    @GET("apis/site/v2/sports/soccer/eng.1/teams/{teamId}")
+    @GET("apis/site/v2/sports/soccer/{league}/teams/{teamId}")
     suspend fun getTeamWithRoster(
+        @Path("league") league: String,
         @Path("teamId") teamId: String,
         @Query("enable") enable: String = "roster"
     ): TeamDetailResponse

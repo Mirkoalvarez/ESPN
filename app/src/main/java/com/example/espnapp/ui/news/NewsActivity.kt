@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.example.espnapp.R
 import com.example.espnapp.common.UiState
 import com.example.espnapp.databinding.ActivityNewsBinding
 import com.example.espnapp.ui.matches.MatchesActivity
@@ -17,6 +18,13 @@ class NewsActivity : AppCompatActivity() {
     private val vm: NewsViewModel by viewModels()
     private val adapter = NewsAdapter { url ->
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+    }
+
+    private val leagueId: String by lazy {
+        intent.getStringExtra(EXTRA_LEAGUE_ID) ?: DEFAULT_LEAGUE_ID
+    }
+    private val leagueName: String by lazy {
+        intent.getStringExtra(EXTRA_LEAGUE_NAME) ?: DEFAULT_LEAGUE_NAME
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +55,7 @@ class NewsActivity : AppCompatActivity() {
             }
         }
         render(loading = true)
-        vm.loadNews()
+        vm.loadNews(leagueId)
     }
 
     private fun render(
@@ -61,5 +69,12 @@ class NewsActivity : AppCompatActivity() {
         binding.viewEmpty.root.visibility = if (empty) View.VISIBLE else View.GONE
         binding.viewError.root.visibility = if (error != null) View.VISIBLE else View.GONE
         binding.viewError.txtError.text = error ?: ""
+    }
+
+    companion object {
+        const val EXTRA_LEAGUE_ID = "extra_league_id"
+        const val EXTRA_LEAGUE_NAME = "extra_league_name"
+        private const val DEFAULT_LEAGUE_ID = "eng.1"
+        private const val DEFAULT_LEAGUE_NAME = "Premier League"
     }
 }
